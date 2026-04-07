@@ -15,10 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          fetch-depth: 0
 
       - name: Download lists
         run: |
+          cd "$GITHUB_WORKSPACE"
           wget -qO meta_cidr4.lst \
             "https://iplist.opencck.org/?format=text&data=cidr4&site=messenger.com&site=whatsapp.com&site=facebook.com&site=instagram.com"
           wget -qO meta_domains.lst \
@@ -26,6 +27,7 @@ jobs:
 
       - name: Commit if changed
         run: |
+          cd "$GITHUB_WORKSPACE"
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add meta_cidr4.lst meta_domains.lst
