@@ -1,0 +1,27 @@
+name: Update lists
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'   # каждые 3 часа
+  workflow_dispatch:          # ручной запуск кнопкой
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download lists
+        run: |
+          wget -qO meta_cidr4.lst \
+            "https://iplist.opencck.org/?format=text&data=cidr4&site=messenger.com&site=whatsapp.com&site=facebook.com&site=instagram.com"
+          wget -qO meta_domains.lst \
+            "https://iplist.opencck.org/?format=text&data=domains&wildcard=1&site=messenger.com&site=whatsapp.com&site=facebook.com&site=instagram.com"
+
+      - name: Commit if changed
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add meta_cidr4.lst meta_domains.lst
+          git diff --cached --quiet || git commit -m "Update lists $(date '+%Y-%m-%d %H:%M')"
+          git push
