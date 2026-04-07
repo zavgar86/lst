@@ -2,8 +2,8 @@ name: Update lists
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
-  workflow_dispatch:
+    - cron: '0 */3 * * *'     # каждые 3 часа (UTC)
+  workflow_dispatch:          # ручной запуск кнопкой
 
 permissions:
   contents: write
@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -31,5 +32,10 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add meta_cidr4.lst meta_domains.lst
-          git diff --cached --quiet || git commit -m "Update lists $(date '+%Y-%m-%d %H:%M')"
-          git diff --cached --quiet || git push
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Update lists $(date '+%Y-%m-%d %H:%M')"
+            git push origin main
+          else
+            echo "No changes"
+          fi
