@@ -2,14 +2,20 @@ name: Update lists
 
 on:
   schedule:
-    - cron: '0 */3 * * *'   # каждые 3 часа
-  workflow_dispatch:          # ручной запуск кнопкой
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Download lists
         run: |
@@ -24,4 +30,4 @@ jobs:
           git config user.name "GitHub Actions"
           git add meta_cidr4.lst meta_domains.lst
           git diff --cached --quiet || git commit -m "Update lists $(date '+%Y-%m-%d %H:%M')"
-          git push
+          git diff --cached --quiet || git push
